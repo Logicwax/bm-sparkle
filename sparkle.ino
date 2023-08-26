@@ -8,33 +8,32 @@
 //#define KIKI_BIKE 1
 
 #ifdef LION_BIKE
-#define FRAME_NUM_LEDS 50 // lion bike
-#define TAIL_NUM_LEDS 32// lion bike
+#define FRAME_NUM_LEDS   50
+#define TAIL_NUM_LEDS    32
 #endif
 
 #ifdef KIKI_BIKE
-#define FRAME_NUM_LEDS 58 // kiki bike
-#define TAIL_NUM_LEDS 33// kiki bike
+#define FRAME_NUM_LEDS   58
+#define TAIL_NUM_LEDS    33
 #endif
 
 #define NUM_LEDS FRAME_NUM_LEDS + TAIL_NUM_LEDS
-#define CHASE_DELAY_TIME 55
-#define CHASE_GROUP_SIZE 3
-#define SPARKLE_LED_ON_TIME 40
-#define MOTION_ACCEL_SENSE_THRESHOLD 2
-#define MOTION_GYRO_SENSE_THRESHOLD 1
-#define SPARKLECOUNT 10
-#define CHASE_FADE_RATE 100
-#define SPARKLE_FADE_RATE 100
+#define CHASE_DELAY_TIME                55
+#define CHASE_GROUP_SIZE                 3
+#define SPARKLE_LED_ON_TIME             40
+#define MOTION_ACCEL_SENSE_THRESHOLD     2
+#define MOTION_GYRO_SENSE_THRESHOLD      1
+#define SPARKLECOUNT                    10
+#define CHASE_FADE_RATE                100
+#define SPARKLE_FADE_RATE              100
+#define IDLE_TIMEOUT                   100
 
-#define BUTTON_INPUT 2
-#define BUTTON_GND 9
-#define FRAME_DATA_PIN 12
-#define FRAME_CLOCK_PIN 10
-
-#define TAIL_DATA_PIN 11
-#define TAIL_CLOCK_PIN 13
-
+#define BUTTON_INPUT      2
+#define BUTTON_GND        9
+#define FRAME_DATA_PIN   12
+#define FRAME_CLOCK_PIN  10
+#define TAIL_DATA_PIN    11
+#define TAIL_CLOCK_PIN   13
 
 CRGB leds[FRAME_NUM_LEDS];
 CRGB tail_leds[FRAME_NUM_LEDS];
@@ -89,13 +88,13 @@ void loop() {
   if (isMotion(getAccel(), getGyro())) {
     idleCounter = 0;
   } else {
-    if (idleCounter < 100) {
+    if (idleCounter < IDLE_TIMEOUT) {
       idleCounter++;
     }
   }
   if (state == 2) {
     chaseMode(colorWheel360(getCompassHeading()));
-  } else if (idleCounter == 100) {
+  } else if (idleCounter == IDLE_TIMEOUT) {
     chaseMode(colorWheel360(getCompassHeading()));
   } else {
     sparkle(getCompassHeading());
@@ -181,15 +180,9 @@ int getCompassHeading() {
 }
 
 void sparkle(int compassHeading) {
-  int sparkles[SPARKLECOUNT];
-  int tail_sparkles[SPARKLECOUNT];
   for (int i=0; i < SPARKLECOUNT; i++) {
-    sparkles[i] = random(FRAME_NUM_LEDS);
-    tail_sparkles[i] = random(TAIL_NUM_LEDS);
-  }
-  for (int i=0; i < SPARKLECOUNT; i++) {
-    leds[sparkles[i]] = colorWheel360(compassHeading);
-    tail_leds[tail_sparkles[i]] = colorWheel360(compassHeading);
+    leds[random(FRAME_NUM_LEDS)] = colorWheel360(compassHeading);
+    tail_leds[random(TAIL_NUM_LEDS)] = colorWheel360(compassHeading);
   }
   LEDS.show();
   delay(SPARKLE_LED_ON_TIME);
@@ -208,9 +201,9 @@ bool isMotion(xyzvector accelValues, xyzvector gyroValues) {
   if (abs(accelValues.x - prevAccelValues.x) > MOTION_ACCEL_SENSE_THRESHOLD ||
     abs(accelValues.y - prevAccelValues.y) > MOTION_ACCEL_SENSE_THRESHOLD ||
     abs(accelValues.z - prevAccelValues.z) > MOTION_ACCEL_SENSE_THRESHOLD ||
-    abs(gyroValues.x -  prevGyroValues.x) > MOTION_GYRO_SENSE_THRESHOLD ||
-    abs(gyroValues.y -  prevGyroValues.y) > MOTION_GYRO_SENSE_THRESHOLD ||
-    abs(gyroValues.z -  prevGyroValues.z) > MOTION_GYRO_SENSE_THRESHOLD
+    abs(gyroValues.x - prevGyroValues.x) > MOTION_GYRO_SENSE_THRESHOLD ||
+    abs(gyroValues.y - prevGyroValues.y) > MOTION_GYRO_SENSE_THRESHOLD ||
+    abs(gyroValues.z - prevGyroValues.z) > MOTION_GYRO_SENSE_THRESHOLD
   ) {
     //Serial.println(abs(accelValues.x - prevAccelValues.x));
     //Serial.println(abs(accelValues.y - prevAccelValues.y));
